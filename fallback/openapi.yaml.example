@@ -1,0 +1,55 @@
+openapi: 3.0.3
+info:
+  title: Lesson 1 API
+  version: 1.0.0
+paths:
+  /version:
+    get:
+      operationId: getVersion
+      summary: Версия сервиса (сгенерированный образец)
+      responses:
+        "200":
+          description: версия
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Version"
+  /items:
+    post:
+      operationId: createItem
+      summary: Создать объявление
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ItemCreate"
+      responses:
+        "201":
+          description: создано
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+components:
+  schemas:
+    Version:
+      type: object
+      required: [version]
+      properties:
+        version:
+          type: string
+    Item:
+      type: object
+      required: [id, title]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+    ItemCreate:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
