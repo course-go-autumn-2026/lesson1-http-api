@@ -63,7 +63,29 @@ oapi-codegen ставить не нужно: `go generate ./...` сам скач
 ## Чекпоинт 2: спека и генерация
 
 1. Добавьте в api/openapi.yaml ручку `POST /items`: тело - схема ItemCreate
-   (уже лежит в components), ответ 201 со схемой Item
+   (уже лежит в components), ответ 201 со схемой Item.
+   В спеке пока нет ни одного POST, поэтому вот каркас - подставьте свои
+   имена и следите за отступами, yaml к ним безжалостен:
+
+   ```yaml
+     /items:
+       post:
+         operationId: createItem
+         requestBody:
+           required: true
+           content:
+             application/json:
+               schema:
+                 $ref: "#/components/schemas/ItemCreate"
+         responses:
+           "201":
+             description: created
+             content:
+               application/json:
+                 schema:
+                   $ref: "#/components/schemas/Item"
+   ```
+
 2. `go generate ./...`
 3. Соберите проект - компилятор скажет, какого метода не хватает
 4. Реализуйте его в internal/api/server.go (образец - GetVersion)
