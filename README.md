@@ -28,16 +28,35 @@ curl -i -X POST localhost:8080/items -H "Content-Type: application/json" -d '{"t
 ## Что где лежит
 
 ```
-cmd/server/main.go       точка входа: mux, ручка /ping, ручка /items/{id}
-internal/middleware/     логирующий middleware (метод, путь, статус ответа)
-internal/api/            gen.go - сгенерированный код (руками не правим),
-                         server.go - реализация ручек из спеки
-api/openapi.yaml         контракт API
-api/cfg.yaml             конфиг генератора
+cmd/server/main.go             точка входа: mux, ручка /ping, ручка /items/{id}
+cmd/graceful-shutdown/main.go  демо graceful shutdown, отдельный сервер на :8090
+internal/middleware/           логирующий middleware (метод, путь, статус ответа)
+internal/api/                  gen.go - сгенерированный код (руками не правим),
+                               server.go - реализация ручек из спеки
+api/openapi.yaml                контракт API
+api/cfg.yaml                    конфиг генератора
 ```
 
 oapi-codegen ставить не нужно: `go generate ./...` сам скачает и запустит
 нужную версию - она прибита в internal/api/generate.go.
+
+## Демо: graceful shutdown
+
+```bash
+go run ./cmd/graceful-shutdown
+```
+
+В соседнем терминале дерните долгую ручку и сразу нажмите Ctrl+C в терминале
+сервера, пока curl еще ждет ответ:
+
+```bash
+curl -i localhost:8090/slow
+```
+
+Сервер не оборвет запрос - дождется ответа (5 секунд) и только потом
+завершится, в логе будет видно оба события по порядку. Без Shutdown
+(например, `kill -9`) соединение обрывается мгновенно, curl получает
+пустой ответ вместо `done`.
 
 ## Финал пары: проектирование ручек
 
