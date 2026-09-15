@@ -1,6 +1,0 @@
-{
-  "name": "lesson1-http-api",
-  "image": "mcr.microsoft.com/devcontainers/go:1.22",
-  "forwardPorts": [8080],
-  "postCreateCommand": "go build ./..."
-}

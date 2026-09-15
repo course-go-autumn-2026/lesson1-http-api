@@ -22,9 +22,6 @@ curl -i localhost:8080/items/42
 curl -i -X POST localhost:8080/items -H "Content-Type: application/json" -d '{"title":"lamp"}'
 ```
 
-Запасной вариант, если локально не завелось: кнопка Code -> Create codespace
-на странице репозитория. Откроется VS Code в браузере с готовым окружением.
-
 ## Что где лежит
 
 ```
