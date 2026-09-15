@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// Демо graceful shutdown. Запустите сервер, дерните curl localhost:8090/slow
+// Демо graceful shutdown. Запустите сервер, дерните curl localhost:8070/slow
 // и сразу нажмите Ctrl+C в терминале сервера: он не оборвет запрос, а
 // дождется ответа и только потом завершится - в логе видно оба события.
 //
@@ -26,7 +26,7 @@ func main() {
 		w.Write([]byte("done\n"))
 	})
 
-	srv := &http.Server{Addr: ":8090", Handler: mux}
+	srv := &http.Server{Addr: ":8070", Handler: mux}
 
 	// ListenAndServe блокирует, поэтому запускаем сервер в горутине,
 	// а в main ждем сигнал остановки.
@@ -34,7 +34,7 @@ func main() {
 	defer stop()
 
 	go func() {
-		log.Println("listening on :8090")
+		log.Println("listening on :8070")
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatal(err)
 		}

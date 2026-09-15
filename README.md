@@ -26,7 +26,8 @@ curl -i -X POST localhost:8080/items -H "Content-Type: application/json" -d '{"t
 
 ```
 cmd/server/main.go             точка входа: mux, ручка /ping, ручка /items/{id}
-cmd/graceful-shutdown/main.go  демо graceful shutdown, отдельный сервер на :8090
+cmd/chi-demo/main.go           те же ручки на chi вместо стандартного mux
+cmd/graceful-shutdown/main.go  демо graceful shutdown, отдельный сервер на :8070
 internal/middleware/           логирующий middleware (метод, путь, статус ответа)
 internal/api/                  gen.go - сгенерированный код (руками не правим),
                                server.go - реализация ручек из спеки
@@ -36,6 +37,17 @@ api/cfg.yaml                    конфиг генератора
 
 oapi-codegen ставить не нужно: `go generate ./...` сам скачает и запустит
 нужную версию - она прибита в internal/api/generate.go.
+
+## Демо: стандартный mux или chi
+
+`cmd/server` и `cmd/chi-demo` реализуют одни и те же ручки (`/ping`,
+`GET /items/{id}`) двумя способами - сравните файлы построчно.
+
+```bash
+go run ./cmd/chi-demo
+curl -i localhost:8081/api/v1/ping
+curl -i localhost:8081/api/v1/items/42
+```
 
 ## Демо: graceful shutdown
 
@@ -47,7 +59,7 @@ go run ./cmd/graceful-shutdown
 сервера, пока curl еще ждет ответ:
 
 ```bash
-curl -i localhost:8090/slow
+curl -i localhost:8070/slow
 ```
 
 Сервер не оборвет запрос - дождется ответа (5 секунд) и только потом
