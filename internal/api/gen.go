@@ -10,13 +10,30 @@ import (
 	"net/http"
 )
 
+// Item defines model for Item.
+type Item struct {
+	Id    int    `json:"id"`
+	Title string `json:"title"`
+}
+
+// ItemCreate defines model for ItemCreate.
+type ItemCreate struct {
+	Title string `json:"title"`
+}
+
 // Version defines model for Version.
 type Version struct {
 	Version string `json:"version"`
 }
 
+// CreateItemJSONRequestBody defines body for CreateItem for application/json ContentType.
+type CreateItemJSONRequestBody = ItemCreate
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+
+	// (POST /items)
+	CreateItem(w http.ResponseWriter, r *http.Request)
 	// Версия сервиса (сгенерированный образец)
 	// (GET /version)
 	GetVersion(w http.ResponseWriter, r *http.Request)
@@ -30,6 +47,20 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// CreateItem operation middleware
+func (siw *ServerInterfaceWrapper) CreateItem(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateItem(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // GetVersion operation middleware
 func (siw *ServerInterfaceWrapper) GetVersion(w http.ResponseWriter, r *http.Request) {
@@ -165,6 +196,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 		ErrorHandlerFunc:   options.ErrorHandlerFunc,
 	}
 
+	m.HandleFunc("POST "+options.BaseURL+"/items", wrapper.CreateItem)
 	m.HandleFunc("GET "+options.BaseURL+"/version", wrapper.GetVersion)
 
 	return m

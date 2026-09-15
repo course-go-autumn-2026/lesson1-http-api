@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -17,17 +18,11 @@ func (rec *statusRecorder) WriteHeader(code int) {
 	rec.ResponseWriter.WriteHeader(code)
 }
 
-// ═══ ШАГ 2. Логирующий middleware ═══════════════════════════════════════
-// Сейчас Logging ничего не делает - просто пропускает запрос дальше.
-// Замените тело функции: оберните next так, чтобы в лог попадали
-// метод, путь и статус ответа.
-//
-// Подсказка:
-//   rec := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
-//   next.ServeHTTP(rec, r)
-//   log.Printf("%s %s -> %d", r.Method, r.URL.Path, rec.status)
-// (не забудьте импорт "log")
-// ════════════════════════════════════════════════════════════════════════
+// Logging пишет в лог метод, путь и статус каждого ответа.
 func Logging(next http.Handler) http.Handler {
-	return next
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		rec := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
+		next.ServeHTTP(rec, r)
+		log.Printf("%s %s -> %d", r.Method, r.URL.Path, rec.status)
+	})
 }
